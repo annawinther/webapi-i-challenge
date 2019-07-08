@@ -4,7 +4,7 @@
 const express = require('express');
 const server = express();
 
-const Hub = require('./data/db');
+const db = require('./data/db');
 
 // step two: configure the newly created express app
 // we need to parse as JSON the request body
@@ -12,7 +12,7 @@ server.use(express.json());
 
 // step three: create endpoints
 server.get('/api/users', (req, res) => {
-    Hub.find()
+    db.find()
         .then(data => {
             // console.log('happy');
             res.status(200).json(data);
@@ -24,7 +24,8 @@ server.get('/api/users', (req, res) => {
 })
 
 server.get('/api/users/:id', (req, res) => {
-    Hub.findById(req.params.id)
+    const userId = req.params.id;
+    db.findById(userId)
         .then(data => {
             if (data) {
                 res.status(200).send(data);
@@ -32,18 +33,23 @@ server.get('/api/users/:id', (req, res) => {
                 res.status(404).json({ message: "The user with the specified ID does not exist." })
             }
         })
-        .catch(err => {
+        .catch(error => {
             res.status(500).json({ error: "The user information could not be retrieved." } )
         })
 })
 
 server.post('/api/users', (req, res) => {
-    Hub.update(req.params.id, req.params.user)
-        .then(data => {
-            res.status(200).json(data)
+    const userData = req.body;
+    db.insert(userData)
+        .then(ususerDataer => {
+            if( userData.name && userData.bio ){
+                res.status(201).json({ success: "true", userData })
+            } else {
+                res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+            }
         })
-        .catch(err => {
-            res.statys(500).json('soryyyyy')
+        .catch(error => {
+            res.status(500).json({ error: "There was an error while saving the user to the database" })
         })
 })
 
