@@ -41,7 +41,7 @@ server.get('/api/users/:id', (req, res) => {
 server.post('/api/users', (req, res) => {
     const userData = req.body;
     db.insert(userData)
-        .then(ususerDataer => {
+        .then(data => {
             if( userData.name && userData.bio ){
                 res.status(201).json({ success: "true", userData })
             } else {
@@ -53,6 +53,23 @@ server.post('/api/users', (req, res) => {
         })
 })
 
+server.delete('/api/users/:id', (req, res) => {
+    const userId = req.params.id;
+    db.remove(userId)
+        .then(data => {
+            if (data) {
+                db.remove(userId)
+                .then(user => {
+                    res.status(201).json({message: `user with id ${userId} is removed`})
+                })
+            } else {
+                res.status(404).json({ message: "The user with the specified ID does not exist." })
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: "The user could not be removed" })
+        })
+})
 // step four: listen for incoming requests
 server.listen(3001, () => {
     console.log('listening on port 3001')
