@@ -15,9 +15,11 @@ server.get('/api/users', (req, res) => {
     Hub.find()
         .then(data => {
             console.log('happy');
+            res.status(200).json(data);
         })
         .catch(err => {
             console.log('sad')
+            res.json(err)
         })
 })
 
