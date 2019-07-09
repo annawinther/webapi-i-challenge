@@ -75,29 +75,40 @@ server.put('/api/users/:id', (req, res) => {
     const userId = req.params.id;
     const userData = req.body;
     db.update(userData, userId)
-    .then(data => {
-        if (!userData.name || !userData.bio){
-            res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
-        } else if () {
-            db.update(userId, userData)
-            .then(data => {
-                db.findById(userId).then(data => {
-                    res.status()
-                })
-                
-                .then(data => {
-                    res.status(201).json({ success: "true", userData })
-                })
+    .then(data =>{
+        if (data && !userData.name || !userData.bio ){
+            db.findById(userId).then(data => {
+                res.status(201).json({ success: "true", userData })
             })
-            .catch(error => {
-                res.status()
-            })
+            res.status(400).json({ errorMessage: "Please provide name and bio for the user." })  
+        } else {
+            res.status(404).json({ message: "The user with the specified ID does not exist." })
         }
     })
     .catch(error => { 
         res.status(500).json({ error: "The user information could not be modified." })
 
     })
+    // .then(data => {
+    //     if (!userData.name || !userData.bio){
+    //         res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+    //     } else if () {
+    //         db.update(userId, userData)
+    //         .then(data => {
+    //             db.findById(userId).then(data => {
+    //                 res.status()
+    //             })
+                
+    //             .then(data => {
+    //                 res.status(201).json({ success: "true", userData })
+    //             })
+    //         })
+    //         .catch(error => {
+    //             res.status()
+    //         })
+    //     }
+    // })
+    
 })
 // step four: listen for incoming requests
 server.listen(3001, () => {
