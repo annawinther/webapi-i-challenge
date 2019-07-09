@@ -58,10 +58,7 @@ server.delete('/api/users/:id', (req, res) => {
     db.remove(userId)
         .then(data => {
             if (data) {
-                db.remove(userId)
-                .then(user => {
-                    res.status(201).json({message: `user with id ${userId} is removed`})
-                })
+                res.status(200).json(data)
             } else {
                 res.status(404).json({ message: "The user with the specified ID does not exist." })
             }
@@ -74,21 +71,26 @@ server.delete('/api/users/:id', (req, res) => {
 server.put('/api/users/:id', (req, res) => {
     const userId = req.params.id;
     const userData = req.body;
-    db.update(userData, userId)
-    .then(data =>{
-        if (data && !userData.name || !userData.bio ){
-            db.findById(userId).then(data => {
-                res.status(201).json({ success: "true", userData })
-            })
-            res.status(400).json({ errorMessage: "Please provide name and bio for the user." })  
-        } else {
-            res.status(404).json({ message: "The user with the specified ID does not exist." })
-        }
-    })
-    .catch(error => { 
-        res.status(500).json({ error: "The user information could not be modified." })
-
-    })
+    if(userData.name && userData.bio){
+        db.update(userData, userId)
+        .then(data =>{
+            if (data){
+                db.findById(userId)
+                .then(data => {
+                    res.status(200).json(userData)
+                })
+            } else {
+                res.status(404).json({ message: "The user with the specified ID does not exist." })
+            }
+        })
+        .catch(error => { 
+            res.status(500).json({ error: "The user information could not be modified." })
+        })
+    } else{
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+    }
+   
+    
     // .then(data => {
     //     if (!userData.name || !userData.bio){
     //         res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
